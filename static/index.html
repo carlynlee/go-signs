@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Event Schedule</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f9f9f9;
+        }
+        h1 {
+            color: #333;
+        }
+        .event {
+            background: #fff;
+            border: 1px solid #ddd;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .event h2 {
+            margin: 0 0 10px;
+        }
+        .event p {
+            margin: 5px 0;
+        }
+        .error {
+            color: red;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>Event Schedule</h1>
+    <div id="schedule">
+        Loading schedule...
+    </div>
+
+    <script>
+        async function fetchSchedule() {
+            try {
+                const response = await fetch('/schedule/');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                const scheduleDiv = document.getElementById('schedule');
+                scheduleDiv.innerHTML = ''; // Clear existing content
+
+                if (data.Presentations && data.Presentations.length > 0) {
+                    data.Presentations.forEach(event => {
+                        const eventDiv = document.createElement('div');
+                        eventDiv.className = 'event';
+                        
+                        eventDiv.innerHTML = `
+                            <h2>${event.Name}</h2>
+                            <p><strong>Topic:</strong> ${event.Topic}</p>
+                            <p><strong>Description:</strong> ${event.Description}</p>
+                            <p><strong>Location:</strong> ${event.Location}</p>
+                            <p><strong>Time:</strong> ${new Date(event.StartTime).toLocaleString()} - ${new Date(event.EndTime).toLocaleString()}</p>
+                            <p><strong>Speakers:</strong> ${event.Speakers.join(', ')}</p>
+                        `;
+
+                        scheduleDiv.appendChild(eventDiv);
+                    });
+                } else {
+                    scheduleDiv.textContent = 'No presentations available.';
+                }
+            } catch (error) {
+                document.getElementById('schedule').innerHTML = `<p class="error">Failed to load schedule: ${error.message}</p>`;
+            }
+        }
+
+        fetchSchedule();
+    </script>
+</body>
+</html>
+

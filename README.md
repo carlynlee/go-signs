@@ -10,4 +10,5 @@
 
 - `go run .` - starts the web server locally
 - http://localhost:8080/schedule/ - the schedule endpoint
+- http://localhost:8080/static/index.html to directly access the static file
 - http://localhost:8080/img/ - the images
