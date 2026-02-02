@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { useSponsor } from '../../contexts/SponsorContext';
+import { useTime } from '../../contexts/TimeContext';
 
 interface SponsorTierProps {
 	title: string;
@@ -53,9 +54,10 @@ export function SponsorThankYou({
 		isLoading,
 		error,
 	} = useSponsor();
+	const { currentTime } = useTime();
 
 	const [currentPage, setCurrentPage] = useState(0);
-	const rotationTimerRef = useRef<number | null>(null);
+	const lastRotationTime = useRef<number>(currentTime.getTime());
 
 	const platinumSponsors = getPlatinumSponsorUrls();
 	const goldSponsors = getGoldSponsorUrls();
@@ -67,25 +69,16 @@ export function SponsorThankYou({
 		(currentPage + 1) * otherSponsorsPerPage
 	);
 
-	// Rotate through other sponsors pages
+	// Rotate through other sponsors pages based on TimeContext
 	useEffect(() => {
 		if (totalPages <= 1) return;
 
-		if (rotationTimerRef.current !== null) {
-			clearInterval(rotationTimerRef.current);
-		}
-
-		rotationTimerRef.current = window.setInterval(() => {
+		const elapsed = currentTime.getTime() - lastRotationTime.current;
+		if (elapsed >= rotationInterval) {
 			setCurrentPage((prev) => (prev + 1) % totalPages);
-		}, rotationInterval);
-
-		return () => {
-			if (rotationTimerRef.current !== null) {
-				clearInterval(rotationTimerRef.current);
-				rotationTimerRef.current = null;
-			}
-		};
-	}, [totalPages, rotationInterval]);
+			lastRotationTime.current = currentTime.getTime();
+		}
+	}, [currentTime, totalPages, rotationInterval]);
 
 	if (isLoading) {
 		return (
