@@ -59,7 +59,9 @@ This feature is extremely useful for testing various schedule states like "in pr
 The application supports multiple views via URL hash:
 
 - **Schedule View** (default): `http://localhost:2017` - Shows the conference schedule with rotating sponsor sidebar
-- **Sponsor Thank You View**: `http://localhost:2017#sponsors` - Full-screen sponsor appreciation display with tiered layout (Platinum, Gold, Community)
+- **Sponsor Thank You View**: `http://localhost:2017/#/sponsors` - Full-screen sponsor appreciation display with tiered layout (Platinum, Gold, Community)
+
+Routing is handled by [React Router](https://reactrouter.com/) using `HashRouter`.
 
 ## Contributing
 
@@ -87,8 +89,7 @@ go-signs/
 │  │  │  ├─ ScheduleCarousel/  # Schedule display component
 │  │  │  ├─ Spinner/           # Loading indicator component
 │  │  │  ├─ SponsorBanner/     # Sponsor image rotation display
-│  │  │  ├─ SponsorThankYou/   # Full-screen tiered sponsor display
-│  │  │  └─ ViewRouter/        # Hash-based view routing
+│  │  │  └─ SponsorThankYou/   # Full-screen tiered sponsor display
 │  │  ├─ contexts/             # React contexts for state management
 │  │  │  ├─ TimeContext/       # Date/time management with URL override
 │  │  │  ├─ ScheduleContext/   # Schedule data management
