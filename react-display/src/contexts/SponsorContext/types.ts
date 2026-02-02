@@ -13,6 +13,15 @@ export interface SponsorContextType {
 	// Get all available sponsor URLs
 	getAllSponsorUrls: () => string[];
 
+	// Get platinum sponsor URLs
+	getPlatinumSponsorUrls: () => string[];
+
+	// Get gold sponsor URLs
+	getGoldSponsorUrls: () => string[];
+
+	// Get other sponsor URLs (not platinum or gold)
+	getOtherSponsorUrls: () => string[];
+
 	// Check if sponsors are currently loading
 	isLoading: boolean;
 

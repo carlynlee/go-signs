@@ -5,6 +5,8 @@ import { SponsorContext } from './sponsorContext';
 
 export function SponsorProvider({ children }: { children: React.ReactNode }) {
 	const [sponsorImages, setSponsorImages] = useState<string[]>([]);
+	const [platinumSponsors, setPlatinumSponsors] = useState<string[]>([]);
+	const [goldSponsors, setGoldSponsors] = useState<string[]>([]);
 	const [isLoading, setIsLoading] = useState<boolean>(true);
 	const [error, setError] = useState<Error | null>(null);
 
@@ -15,24 +17,44 @@ export function SponsorProvider({ children }: { children: React.ReactNode }) {
 		setIsLoading(true);
 		setError(null);
 		try {
-			const response = await fetch('/sponsors/all');
-			if (!response.ok) {
+			// Fetch all sponsor data in parallel
+			const [allResponse, platinumResponse, goldResponse] = await Promise.all([
+				fetch('/sponsors/all'),
+				fetch('/sponsors/platinum'),
+				fetch('/sponsors/gold'),
+			]);
+
+			if (!allResponse.ok) {
 				throw new Error(
-					`Failed to fetch sponsors: ${String(response.status)} ${
-						response.statusText
+					`Failed to fetch sponsors: ${String(allResponse.status)} ${
+						allResponse.statusText
 					}`
 				);
 			}
-			const data: unknown = await response.json();
-			if (!Array.isArray(data)) {
+
+			const allData: unknown = await allResponse.json();
+			const platinumData: unknown = await platinumResponse.json();
+			const goldData: unknown = await goldResponse.json();
+
+			if (!Array.isArray(allData)) {
 				throw new Error(
 					'Expected an array of strings but received a different data structure'
 				);
 			}
-			const images = data.filter(
+
+			const images = allData.filter(
 				(item): item is string => typeof item === 'string'
 			);
+			const platinum = Array.isArray(platinumData)
+				? platinumData.filter((item): item is string => typeof item === 'string')
+				: [];
+			const gold = Array.isArray(goldData)
+				? goldData.filter((item): item is string => typeof item === 'string')
+				: [];
+
 			setSponsorImages(images);
+			setPlatinumSponsors(platinum);
+			setGoldSponsors(gold);
 			// Reset the used images ref when new data comes in
 			usedImagesRef.current = new Set();
 		} catch (err) {
@@ -90,12 +112,30 @@ export function SponsorProvider({ children }: { children: React.ReactNode }) {
 		return sponsorImages.map((img) => `/sponsors/images/${img}`);
 	}, [sponsorImages]);
 
+	const getPlatinumSponsorUrls = useCallback((): string[] => {
+		return platinumSponsors.map((img) => `/sponsors/images/${img}`);
+	}, [platinumSponsors]);
+
+	const getGoldSponsorUrls = useCallback((): string[] => {
+		return goldSponsors.map((img) => `/sponsors/images/${img}`);
+	}, [goldSponsors]);
+
+	const getOtherSponsorUrls = useCallback((): string[] => {
+		const tieredSponsors = new Set([...platinumSponsors, ...goldSponsors]);
+		return sponsorImages
+			.filter((img) => !tieredSponsors.has(img))
+			.map((img) => `/sponsors/images/${img}`);
+	}, [sponsorImages, platinumSponsors, goldSponsors]);
+
 	const contextValue = React.useMemo(
 		() => ({
 			getRandomSponsorUrl,
 			getRandomSponsorUrls,
 			refreshSponsors: fetchSponsorImages,
 			getAllSponsorUrls,
+			getPlatinumSponsorUrls,
+			getGoldSponsorUrls,
+			getOtherSponsorUrls,
 			isLoading,
 			error,
 		}),
@@ -104,6 +144,9 @@ export function SponsorProvider({ children }: { children: React.ReactNode }) {
 			getRandomSponsorUrls,
 			fetchSponsorImages,
 			getAllSponsorUrls,
+			getPlatinumSponsorUrls,
+			getGoldSponsorUrls,
+			getOtherSponsorUrls,
 			isLoading,
 			error,
 		]
