@@ -15,6 +15,7 @@ A [DEMO](https://demo.go-signs.org) of this application is available online. It 
 - **Real-time Schedule Updates**: Pulls schedule data from the SCaLE Drupal CMS via JSON endpoint
 - **Responsive React Frontend**: Clean, auto-scrolling display of schedule information
 - **Sponsor Showcase**: Sponsors are prominently displayed near the conference schedule
+- **Sponsor Thank You View**: Dedicated full-screen view thanking sponsors by tier (Platinum, Gold, Community)
 - **Embedded Assets**: Single binary includes all web assets and sponsor images
 - **Clock Override**: Support for time simulation via URL parameters for testing
 - **Automatic Refresh**: Self-updating schedule and continuous display rotation
@@ -53,6 +54,13 @@ This feature is extremely useful for testing various schedule states like "in pr
 - `hour`
 - `minute`
 
+### View Switching
+
+The application supports multiple views via URL hash:
+
+- **Schedule View** (default): `http://localhost:2017` - Shows the conference schedule with rotating sponsor sidebar
+- **Sponsor Thank You View**: `http://localhost:2017#sponsors` - Full-screen sponsor appreciation display with tiered layout (Platinum, Gold, Community)
+
 ## Contributing
 
 see [CONTRIBUTING](./CONTRIBUTING.md)
@@ -78,7 +86,9 @@ go-signs/
 │  │  │  ├─ Header/            # Header component with logo, clock and WiFi info
 │  │  │  ├─ ScheduleCarousel/  # Schedule display component
 │  │  │  ├─ Spinner/           # Loading indicator component
-│  │  │  └─ SponsorBanner/     # Sponsor image rotation display
+│  │  │  ├─ SponsorBanner/     # Sponsor image rotation display
+│  │  │  ├─ SponsorThankYou/   # Full-screen tiered sponsor display
+│  │  │  └─ ViewRouter/        # Hash-based view routing
 │  │  ├─ contexts/             # React contexts for state management
 │  │  │  ├─ TimeContext/       # Date/time management with URL override
 │  │  │  ├─ ScheduleContext/   # Schedule data management
