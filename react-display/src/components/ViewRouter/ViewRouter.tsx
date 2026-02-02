@@ -1,6 +1,8 @@
 // react-display/src/components/ViewRouter/ViewRouter.tsx
 
 import { useState, useEffect } from 'react';
+import { SponsorProvider } from '../../contexts/SponsorContext';
+import { ScheduleProvider } from '../../contexts/ScheduleContext';
 import { SponsorBanner } from '../SponsorBanner';
 import { ScheduleCarousel } from '../ScheduleCarousel';
 import { SponsorThankYou } from '../SponsorThankYou';
@@ -29,27 +31,36 @@ export function ViewRouter() {
 	if (viewMode === 'sponsors') {
 		return (
 			<div className='flex-1 overflow-hidden'>
-				<SponsorThankYou
-					otherSponsorsPerPage={12}
-					rotationInterval={8000}
-				/>
+				{/* SponsorProvider wraps only SponsorThankYou */}
+				<SponsorProvider>
+					<SponsorThankYou
+						otherSponsorsPerPage={12}
+						rotationInterval={8000}
+					/>
+				</SponsorProvider>
 			</div>
 		);
 	}
 
 	return (
 		<div className='flex flex-1 bg-white overflow-hidden'>
+			{/* ScheduleProvider wraps only ScheduleCarousel */}
 			<div className='w-4/5 p-2 overflow-y-auto'>
-				<ScheduleCarousel
-					maxDisplay={6}
-					rotationInterval={15000}
-				/>
+				<ScheduleProvider refreshInterval={60000}>
+					<ScheduleCarousel
+						maxDisplay={6}
+						rotationInterval={15000}
+					/>
+				</ScheduleProvider>
 			</div>
+			{/* SponsorProvider wraps only SponsorBanner */}
 			<div className='w-1/5 p-2'>
-				<SponsorBanner
-					displayCount={3}
-					rotationInterval={10000}
-				/>
+				<SponsorProvider>
+					<SponsorBanner
+						displayCount={3}
+						rotationInterval={10000}
+					/>
+				</SponsorProvider>
 			</div>
 		</div>
 	);
