@@ -15,6 +15,7 @@ export function TimeProvider({ children }: TimeProviderProps) {
 		// Get initial time based on URL parameters or current time
 		const getInitialTime = (): Date => {
 			const params = new URLSearchParams(window.location.search);
+			const now = new Date();
 
 			const year = parseInt(params.get('year') ?? '', 10);
 			const month = parseInt(params.get('month') ?? '', 10) - 1; // 0-indexed month
@@ -22,21 +23,21 @@ export function TimeProvider({ children }: TimeProviderProps) {
 			const hour = parseInt(params.get('hour') ?? '', 10);
 			const minute = parseInt(params.get('minute') ?? '', 10);
 
-			// All parameters must be valid to create a custom time
+			// If ANY time parameter is provided, create custom time using current values as defaults
 			if (
-				!isNaN(year) &&
-				!isNaN(month) &&
-				!isNaN(day) &&
-				!isNaN(hour) &&
-				!isNaN(minute)
+				params.has('year') ||
+				params.has('month') ||
+				params.has('day') ||
+				params.has('hour') ||
+				params.has('minute')
 			) {
 				const customDate = new Date();
 
-				customDate.setFullYear(year);
-				customDate.setMonth(month);
-				customDate.setDate(day);
-				customDate.setHours(hour);
-				customDate.setMinutes(minute);
+				customDate.setFullYear(!isNaN(year) ? year : now.getFullYear());
+				customDate.setMonth(!isNaN(month) ? month : now.getMonth());
+				customDate.setDate(!isNaN(day) ? day : now.getDate());
+				customDate.setHours(!isNaN(hour) ? hour : now.getHours());
+				customDate.setMinutes(!isNaN(minute) ? minute : now.getMinutes());
 				customDate.setSeconds(0);
 
 				return customDate;
