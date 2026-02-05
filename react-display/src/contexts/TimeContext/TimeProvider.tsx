@@ -17,34 +17,18 @@ export function TimeProvider({ children }: TimeProviderProps) {
 			const params = new URLSearchParams(window.location.search);
 			const now = new Date();
 
-			const year = parseInt(params.get('year') ?? '', 10);
-			const month = parseInt(params.get('month') ?? '', 10) - 1; // 0-indexed month
-			const day = parseInt(params.get('day') ?? '', 10);
-			const hour = parseInt(params.get('hour') ?? '', 10);
-			const minute = parseInt(params.get('minute') ?? '', 10);
+			// Helper to parse param or use fallback (handles null and empty string)
+			const parseParam = (param: string | null, fallback: number): number =>
+				param !== null && param !== '' ? parseInt(param, 10) : fallback;
 
-			// If ANY time parameter is provided, create custom time using current values as defaults
-			if (
-				params.has('year') ||
-				params.has('month') ||
-				params.has('day') ||
-				params.has('hour') ||
-				params.has('minute')
-			) {
-				const customDate = new Date();
+			const year = parseParam(params.get('year'), now.getFullYear());
+			const monthParam = params.get('month');
+			const month = monthParam !== null && monthParam !== '' ? parseInt(monthParam, 10) - 1 : now.getMonth(); // URL is 1-indexed, JS is 0-indexed
+			const day = parseParam(params.get('day'), now.getDate());
+			const hour = parseParam(params.get('hour'), now.getHours());
+			const minute = parseParam(params.get('minute'), now.getMinutes());
 
-				customDate.setFullYear(!isNaN(year) ? year : now.getFullYear());
-				customDate.setMonth(!isNaN(month) ? month : now.getMonth());
-				customDate.setDate(!isNaN(day) ? day : now.getDate());
-				customDate.setHours(!isNaN(hour) ? hour : now.getHours());
-				customDate.setMinutes(!isNaN(minute) ? minute : now.getMinutes());
-				customDate.setSeconds(0);
-
-				return customDate;
-			}
-
-			// Otherwise, use current time
-			return new Date();
+			return new Date(year, month, day, hour, minute, 0);
 		};
 
 		// Calculate the offset between initial time and actual time
